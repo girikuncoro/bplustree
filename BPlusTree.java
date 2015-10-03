@@ -58,8 +58,8 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			leaf.values.remove(leaf.values.size()-1);
 		}
 		
-		LeafNode<K,T> rNode = new LeafNode<K,T>(newKeys, newValues);
 		K splitKey = newKeys.get(0);
+		LeafNode<K,T> rNode = new LeafNode<K,T>(newKeys, newValues);
 		Entry<K, Node<K,T>> ret = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rNode);
 		
 		return ret;
@@ -73,8 +73,24 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return new key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitIndexNode(IndexNode<K,T> index) {
-
-		return null;
+		ArrayList<K> newKeys = new ArrayList<K>();
+		ArrayList<Node<K,T>> newChildren = new ArrayList<Node<K,T>>();
+		
+		for(int i=D; i<=2*D; i++) {
+			newKeys.add(index.keys.get(i));
+			newChildren.add(index.children.get(i));
+		}
+		
+		for(int i=D; i<=2*D; i++) {
+			index.keys.remove(index.keys.size()-1);
+			index.children.remove(index.children.size()-1);
+		}
+		
+		K splitKey = newKeys.get(0);
+		IndexNode<K,T> rNode = new IndexNode<K,T>(newKeys, newChildren);
+		Entry<K, Node<K,T>> ret = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rNode);
+		
+		return ret;
 	}
 
 	/**
