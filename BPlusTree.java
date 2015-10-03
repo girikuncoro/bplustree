@@ -1,5 +1,7 @@
 import java.util.AbstractMap;
 import java.util.Map.Entry;
+import java.util.ArrayList;
+
 
 /**
  * BPlusTree Class Assumptions: 1. No duplicate keys inserted 2. Order D:
@@ -43,8 +45,24 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return the key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
-
-		return null;
+		ArrayList<K> newKeys = new ArrayList<K>();
+		ArrayList<T> newValues = new ArrayList<T>();
+		
+		for(int i=D; i<=2*D; i++) {
+			newKeys.add(leaf.keys.get(i));
+			newValues.add(leaf.values.get(i));
+		}
+		
+		for(int i=D; i<=2*D; i++) {
+			leaf.keys.remove(leaf.keys.size()-1);
+			leaf.values.remove(leaf.values.size()-1);
+		}
+		
+		LeafNode<K,T> rNode = new LeafNode<K,T>(newKeys, newValues);
+		K splitKey = newKeys.get(0);
+		Entry<K, Node<K,T>> ret = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rNode);
+		
+		return ret;
 	}
 
 	/**
