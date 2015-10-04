@@ -36,8 +36,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	private Node<K,T> treeSearch(Node<K,T> node, K key) {
 		if(node.isLeafNode) {
 			return node;
-		} else {
-			// The node is index node
+		} 
+		// The node is index node
+		else {
 			IndexNode<K,T> index = (IndexNode<K,T>)node;
 			// K < K1, return treeSearch(P0, K)
 			if(key.compareTo(node.keys.get(0)) < 0) {
@@ -62,22 +63,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
  			}
 		}
 	} 
-	
-//
-//	public T search(K key) {
-//        if (root == null || key == null)
-//            return null;
-//        LeafNode leafFound = (LeafNode)treeSearch(root, key); // down casting
-//
-//        T val = null;
-//        for(int pos = 0; pos < leafFound.keys.size(); pos++){
-//            if (key.compareTo((K) (leafFound.keys.get(pos))) == 0)
-//                val = (T)leafFound.values.get(pos);
-//        }
-//
-//        return val;
-//	}
-	
 	
 	/**
 	 * TODO Insert a key/value pair into the BPlusTree
