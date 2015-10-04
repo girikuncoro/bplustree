@@ -57,6 +57,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				Entry<K, Node<K,T>> rSplit = splitLeafNode(leaf); 
 				return rSplit;
 			}
+			return null;
 			
 		} else {
 			IndexNode idx = (IndexNode) node;
@@ -79,7 +80,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			}
 		}
 		
-		// No overflow found
+		// Insert the overflowed index
 		if(overflow != null) {
 			IndexNode idxNode = (IndexNode) node;
 			int idxParent = idxNode.keys.size();
