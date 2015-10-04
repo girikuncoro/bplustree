@@ -20,10 +20,65 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return value
 	 */
 	public T search(K key) {
+		// Look for leaf node that key is pointing to
+		LeafNode<K,T> leaf = (LeafNode<K,T>)treeSearch(root, key);
+		
+		// Look for value in the leaf
+		for(int i=0; i<leaf.keys.size(); i++) {
+			if(key.compareTo(leaf.keys.get(i)) == 0) {
+				return leaf.values.get(i);
+			}
+		}
+		
 		return null;
 	}
 	
-
+	private Node<K,T> treeSearch(Node<K,T> node, K key) {
+		if(node.isLeafNode) {
+			return node;
+		} else {
+			// The node is index node
+			IndexNode<K,T> index = (IndexNode<K,T>)node;
+			// K < K1, return treeSearch(P0, K)
+			if(key.compareTo(node.keys.get(0)) < 0) {
+				return treeSearch((Node<K,T>)index.children.get(0), key);
+			}
+			// K >= Km, return treeSearch(Pm, K), m = #entries
+			else if(key.compareTo(node.keys.get(node.keys.size()-1)) >= 0) {
+				return treeSearch((Node<K,T>)index.children.get(index.children.size()-1), key);
+			}
+			// Find i such that Ki <= K < K(i+1), return treeSearch(Pi,K)
+			else {
+				// Linear searching
+				int hit = 0;
+				for(int i=0; i<index.keys.size(); i++) {
+					K iKey = index.keys.get(i);
+					if(key.compareTo(iKey) == 0) {
+						hit = i;
+						break;
+					}
+				}
+				return treeSearch((Node<K,T>)index.children.get(hit), key);
+ 			}
+		}
+	} 
+	
+//
+//	public T search(K key) {
+//        if (root == null || key == null)
+//            return null;
+//        LeafNode leafFound = (LeafNode)treeSearch(root, key); // down casting
+//
+//        T val = null;
+//        for(int pos = 0; pos < leafFound.keys.size(); pos++){
+//            if (key.compareTo((K) (leafFound.keys.get(pos))) == 0)
+//                val = (T)leafFound.values.get(pos);
+//        }
+//
+//        return val;
+//	}
+	
+	
 	/**
 	 * TODO Insert a key/value pair into the BPlusTree
 	 * 
