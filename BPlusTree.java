@@ -85,7 +85,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
 					newChildEntry = null;
 					return newChildEntry;
 				} 
-				// Note difference with splitting leaf page
 				else{
 					newChildEntry = splitIndexNode(index);
 					// Root was just split
@@ -159,9 +158,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
         rightNode.previousLeaf = leaf;
         rightNode.nextLeaf = tmp;
         
-		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rightNode);
+		Entry<K, Node<K,T>> newChildEntry = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rightNode);
 		
-		return entry;
+		return newChildEntry;
 	}
 
 	/**
@@ -172,59 +171,30 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return new key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitIndexNode(IndexNode<K,T> index) {
-		K splittingKey = index.keys.get(D);
-        index.keys.remove(D);
+		ArrayList<K> newKeys = new ArrayList<K>();
+		ArrayList<Node<K,T>> newChildren = new ArrayList<Node<K,T>>();
+		
+		// Note difference with splitting leaf page, 2D+1 key values and 2D+2 node pointers
+		K splitKey = index.keys.get(D);
+		index.keys.remove(D);
+		
+		// First D key values and D+1 node pointers stay
+		// Last D keys and D+1 pointers move to new node
+		newChildren.add(index.children.get(D+1));
+		index.children.remove(D+1);
+		
+		while(index.keys.size() > D) {
+			newKeys.add(index.keys.get(D));
+			index.keys.remove(D);
+			newChildren.add(index.children.get(D+1));
+			index.children.remove(D+1);
+		}
 
-        ArrayList<K> RightKey = new ArrayList<K>();
-        ArrayList<Node<K,T>> RightChildren = new ArrayList<Node<K, T>>();
+		IndexNode<K,T> rightNode = new IndexNode<K,T>(newKeys, newChildren);
+		Entry<K, Node<K,T>> newChildEntry = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rightNode);
 
-        RightChildren.add(index.children.get(D+1));
-        index.children.remove(D+1);
-
-        while (index.keys.size() > D){
-            RightKey.add(index.keys.get(D));
-            index.keys.remove(D);
-            RightChildren.add(index.children.get(D + 1));
-            index.children.remove(D + 1);
-        }
-
-        IndexNode Right = new IndexNode(RightKey, RightChildren);
-        Entry<K,Node<K,T>> entry = new AbstractMap.SimpleEntry<K,Node<K,T>>(splittingKey, Right);
-		return entry;
+		return newChildEntry;
 	}
-
-
-	/**
-	 * Split a leaf node and return the new right node and the splitting
-	 * key as an Entry<splittingKey, RightNode>
-	 * 
-	 * @param leaf
-	 * @return the key/node pair as an Entry
-	 */
-//	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
-//
-//        ArrayList<K> rightKeys = new ArrayList<K>();
-//        ArrayList<T> rightValues = new ArrayList<T>();
-//        K splittingKey = leaf.keys.get(D);
-//
-//        while (leaf.keys.size() > D){
-//            rightKeys.add(leaf.keys.get(D));
-//            leaf.keys.remove(D);
-//            rightValues.add(leaf.values.get(D));
-//            leaf.values.remove(D);
-//        }
-//
-//        LeafNode rightNode = new LeafNode(rightKeys, rightValues);
-//        LeafNode Tmp = leaf.nextLeaf;
-//        leaf.nextLeaf = rightNode;
-//        leaf.nextLeaf.previousLeaf = rightNode;
-//        rightNode.previousLeaf = leaf;
-//        rightNode.nextLeaf = Tmp;
-//
-//
-//        Entry<K,Node<K,T>> entry = new AbstractMap.SimpleEntry<K,Node<K,T>>(splittingKey, rightNode);
-//		return entry;
-//	}
 	
 	/**
 	 * TODO Delete a key/value pair from this B+Tree
