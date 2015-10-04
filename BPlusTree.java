@@ -152,11 +152,11 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		LeafNode<K,T> rightNode = new LeafNode<K,T>(newKeys, newValues);
 		
 		// Set sibling pointers
-        LeafNode<K,T> tmp = leaf.nextLeaf;
-        leaf.nextLeaf = rightNode;
-        leaf.nextLeaf.previousLeaf = rightNode;
-        rightNode.previousLeaf = leaf;
-        rightNode.nextLeaf = tmp;
+		LeafNode<K,T> tmp = leaf.nextLeaf;
+		leaf.nextLeaf = rightNode;
+		leaf.nextLeaf.previousLeaf = rightNode;
+		rightNode.previousLeaf = leaf;
+		rightNode.nextLeaf = tmp;
         
 		Entry<K, Node<K,T>> newChildEntry = new AbstractMap.SimpleEntry<K, Node<K,T>>(splitKey, rightNode);
 		
