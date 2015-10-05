@@ -440,7 +440,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		}	
 		// Redistribute evenly between right and left nodes
 		// If S has extra entries
-		if(left.keys.size() + right.keys.size() > 2*D) {
+		if(left.keys.size() + right.keys.size() >= 2*D) {
 			// Left node has more entries
 			if(left.keys.size() > right.keys.size()) {
 				while(left.keys.size() > D) {
@@ -482,7 +482,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			return i-1;
 		}
 	}
-
+	
 	/**
 	 * TODO Handle IndexNode Underflow (merge or redistribution)
 	 * 

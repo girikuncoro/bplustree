@@ -121,6 +121,7 @@ public class Tests {
 		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
 		Utils.bulkInsert(tree, exampleNumbers, primeNumberStrings);
 		Utils.printTree(tree);
+		
 		tree.delete(13);
 		tree.delete(17);
 		tree.delete(30);
@@ -142,6 +143,8 @@ public class Tests {
 		}
 		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
 		Utils.bulkInsert(tree, testNumbers, testNumberStrings);
+		System.out.println("Bug: ");
+		System.out.println(Utils.outputTree(tree));
 
 		tree.delete(6);
 		tree.delete(7);
