@@ -110,7 +110,7 @@ public class Tests {
 		assertEquals(null, emptyTree.search(null));
 	}
 	
-//	@Test
+	@Test
 	public void testBookExampleShort() {
 		Integer exampleNumbers[] = new Integer[] { 2, 3, 13, 14, 17, 19, 24, 27,
 				30, 33, 34, 38, 5, 7, 16, 20, 22, 29 };
@@ -133,7 +133,7 @@ public class Tests {
 	}
 
 	// testing proper leaf node merging behaviour
-//	@Test
+	@Test
 	public void testDeleteLeafNodeRedistribute() {
 		Integer testNumbers[] = new Integer[] { 2, 4, 7, 8, 5, 6, 3 };
 		String testNumberStrings[] = new String[testNumbers.length];
@@ -154,7 +154,7 @@ public class Tests {
 	}
 
 	// Testing appropriate depth and node invariants on a big tree
-//	@Test
+	@Test
 	public void testLargeTree() {
 		BPlusTree<Integer, Integer> tree = new BPlusTree<Integer, Integer>();
 		ArrayList<Integer> numbers = new ArrayList<Integer>(100000);
