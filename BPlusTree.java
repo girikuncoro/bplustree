@@ -99,31 +99,32 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			IndexNode<K,T> index = (IndexNode<K,T>) node;
 			int i = 0;
 			while(i < node.keys.size()) {
-				if(entry.getKey().compareTo(node.keys.get(i)) >= 0) {
-					i++;
+				if(entry.getKey().compareTo(node.keys.get(i)) < 0) {
+					break;
 				}
+				i++;
 			}
 			// Recursively, insert entry
 			newChildEntry = getChildEntry((Node<K,T>) index.children.get(i), entry, newChildEntry);
 			// Usual case, didn't split child
 			if(newChildEntry == null) {
-				return newChildEntry;
+				return null;
 			} 
-			// Split child, must insert newChildEntry in node
+			// Split child case, must insert newChildEntry in node
 			else {
 				int j = 0;
 				while (j < index.keys.size()) {
-					if(newChildEntry.getKey().compareTo(node.keys.get(j)) >= 0) {
-						j++;
+					if(newChildEntry.getKey().compareTo(node.keys.get(j)) < 0) {
+						break;
 					}
+					j++;
 				}
 				
 				index.insertSorted(newChildEntry, j);
 				
 				// Usual case, put newChildEntry on it, set newChildEntry to null, return
 				if(!index.isOverflowed()) {
-					newChildEntry = null;
-					return newChildEntry;
+					return null;
 				} 
 				else{
 					newChildEntry = splitIndexNode(index);
@@ -132,8 +133,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 						// Create new node and make tree's root-node pointer point to newRoot
 						IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), root, newChildEntry.getValue());
 						root = newRoot;
-						newChildEntry = null;
-						return newChildEntry;
+						return null;
 					}
 					return newChildEntry;
 				}
@@ -148,8 +148,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			
 			// Usual case: leaf has space, put entry and set newChildEntry to null and return
 			if(!leaf.isOverflowed()) {
-				newChildEntry = null;
-				return newChildEntry;
+				return null;
 			}
 			// Once in a while, the leaf is full
 			else {
@@ -157,8 +156,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				if(leaf == root) {
 					IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), leaf, newChildEntry.getValue());
 					root = newRoot;
-					newChildEntry = null;
-					return newChildEntry;
+					return null;
 				}
 				return newChildEntry;
 			}
