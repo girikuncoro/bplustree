@@ -250,9 +250,47 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			return;
 		}
 
+		// Check if entry key exist in the leaf node
 		LeafNode<K,T> leaf = (LeafNode<K,T>)treeSearch(root, key);
-		// Some processes
-		return;
+		if(leaf == null) {
+			return;
+		}
+		
+		// Delete entry from subtree with root node pointer
+		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(key, leaf);
+		
+		// oldChildEntry null initially, and null upon return unless child deleted
+		Entry<K, Node<K,T>> oldChildEntry = deleteChildEntry(root, root, entry, null);
+		
+		// Readjust the root, no child is deleted
+		if(oldChildEntry == null) {
+			if(root.keys.size() == 0) {
+				if(!root.isLeafNode) {
+					root = ((IndexNode<K,T>) root).children.get(0);
+				}
+			}
+			return;
+		}
+		// Child is deleted
+		else {
+			// Find empty node
+			int i = 0;
+			K oldKey = oldChildEntry.getKey();
+			while(i < root.keys.size()) {
+				if(oldKey.compareTo(root.keys.get(i)) == 0) {
+					break;
+				}
+				i++;
+			}
+			// Return if empty node already discarded
+			if(i == root.keys.size()) {
+				return;
+			}
+			// Discard empty node
+			root.keys.remove(i);
+			((IndexNode<K,T>)root).children.remove(i+1);
+			return;
+		}
 	}
 	
 	private Entry<K, Node<K,T>> deleteChildEntry(Node<K,T> parentNode, Node<K,T> node, 
@@ -269,7 +307,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				i++;
 			}
 			// Recursive delete
-			oldChildEntry = deleteChildEntry(node, index.children.get(i), entry, oldChildEntry);
+			oldChildEntry = deleteChildEntry(index, index.children.get(i), entry, oldChildEntry);
 			
 			// Usual case: child not deleted
 			if(oldChildEntry == null) {
@@ -280,7 +318,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				int j = 0;
 				K oldKey = oldChildEntry.getKey();
 				while(j < index.keys.size()) {
-					if(oldKey.compareTo(index.keys.get(j)) >= 0) {
+					if(oldKey.compareTo(index.keys.get(j)) == 0) {
 						break;
 					}
 					j++;
@@ -289,12 +327,16 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				index.keys.remove(j);
 				index.children.remove(j+1);
 				
-				// Check for underflow
-				if(!index.isUnderflowed()) {
+				// Check for underflow, return null if empty
+				if(!index.isUnderflowed() || index.keys.size() == 0) {
 					// Node has entries to spare, delete doesn't go further
 					return null; 
 				}
 				else {
+					// Return if root
+					if(index == root) {
+						return oldChildEntry;
+					}
 					// Get sibling S using parent pointer
 					int s = 0;
 					K firstKey = index.keys.get(0);
@@ -304,8 +346,27 @@ public class BPlusTree<K extends Comparable<K>, T> {
 						}
 						s++;
 					}
-					
 					// Handle index underflow
+					int splitKeyPos;
+					IndexNode<K,T> parent = (IndexNode<K,T>)parentNode;
+					
+					if(s > 0 && parent.children.get(s-1) != null) {
+						splitKeyPos = handleIndexNodeUnderflow((IndexNode<K,T>)parent.children.get(s-1), 
+								index, parent);
+					} else {
+						splitKeyPos = handleIndexNodeUnderflow((IndexNode<K,T>)parent.children.get(s+1), 
+								index, parent);
+					}
+					// S has extra entries, set oldChildentry to null, return
+					if(splitKeyPos == -1) {
+						return null;
+					}
+					// Merge indexNode and S
+					else {
+						K parentKey = parentNode.keys.get(splitKeyPos);
+						oldChildEntry = new AbstractMap.SimpleEntry<K, Node<K,T>>(parentKey, parentNode);
+						return oldChildEntry;
+					}
 				}
 			}
 		}
@@ -320,17 +381,38 @@ public class BPlusTree<K extends Comparable<K>, T> {
 					break;
 				}
 			}
-			
 			// Usual case: no underflow
 			if(!leaf.isUnderflowed()) {
 				return null;
 			}
 			// Once in a while, the leaf becomes underflow
 			else {
+				// Return if root
+				if(leaf == root) {
+					return oldChildEntry;
+				}
 				// Handle leaf underflow
+				int splitKeyPos;
+				K firstKey = leaf.keys.get(0);
+				K parentKey = parentNode.keys.get(0);
+				
+				if(leaf.previousLeaf != null && firstKey.compareTo(parentKey) >= 0) {
+					splitKeyPos = handleLeafNodeUnderflow(leaf.previousLeaf, leaf, (IndexNode<K,T>)parentNode);
+				} else {
+					splitKeyPos = handleLeafNodeUnderflow(leaf, leaf.nextLeaf, (IndexNode<K,T>)parentNode);
+				}
+				// S has extra entries, set oldChildEntry to null, return
+				if(splitKeyPos == -1) {
+					return null;
+				} 
+				// Merge leaf and S
+				else {
+					parentKey = parentNode.keys.get(splitKeyPos);
+					oldChildEntry = new AbstractMap.SimpleEntry<K, Node<K,T>>(parentKey, parentNode);
+					return oldChildEntry;
+				}	
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -382,7 +464,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			
 			return -1;
 		}
-		// Merge leaf and S
+		// No extra entries, return splitKeyPos
 		else {
 			// Move all entries from right to left node
 			while(right.keys.size() > 0) {
@@ -415,7 +497,54 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 */
 	public int handleIndexNodeUnderflow(IndexNode<K,T> leftIndex,
 			IndexNode<K,T> rightIndex, IndexNode<K,T> parent) {
-		return -1;
+		// Find entry in parent for node on right
+		int i = 0;
+		K rKey = rightIndex.keys.get(0);
+		while(i < parent.keys.size()) {
+			if(rKey.compareTo(parent.keys.get(i)) < 0) {
+				break;
+			}
+			i++;
+		}
+		// Redistribute evenly between node and S through parent
+		// If S has extra entries
+		if(leftIndex.keys.size() + rightIndex.keys.size() >= 2*D) {
+			// Left node has more entries
+			if(leftIndex.keys.size() > rightIndex.keys.size()) {
+				while(leftIndex.keys.size() > D) {
+					rightIndex.keys.add(0, parent.keys.get(i-1));
+					rightIndex.children.add(leftIndex.children.get(leftIndex.children.size()-1));
+					parent.keys.set(i-1, leftIndex.keys.get(leftIndex.keys.size()-1));
+					leftIndex.keys.remove(leftIndex.keys.size()-1);
+					leftIndex.children.remove(leftIndex.children.size()-1);
+				}
+			}
+			// Right node has more entries
+			else {
+				while(leftIndex.keys.size() < D) {
+					leftIndex.keys.add(parent.keys.get(i-1));
+					leftIndex.children.add(rightIndex.children.get(0));
+					parent.keys.set(i-1, rightIndex.keys.get(0));
+					rightIndex.keys.remove(0);
+					rightIndex.children.remove(0);
+				}
+			}
+			return -1;
+		}
+		// No extra entries, return spiltKeyPos
+		else {
+			leftIndex.keys.add(parent.keys.get(i-1));
+			// Move all entries from right to left node
+			while(rightIndex.keys.size() > 0) {
+				leftIndex.keys.add(rightIndex.keys.get(0));
+				leftIndex.children.add(rightIndex.children.get(0));
+				rightIndex.keys.remove(0);
+				rightIndex.children.remove(0);
+			}
+			leftIndex.children.add(rightIndex.children.get(0));
+			rightIndex.children.remove(0);
+			
+			return i-1;
+		}
 	}
-
 }

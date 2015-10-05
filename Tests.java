@@ -31,11 +31,11 @@ public class Tests {
 		assertEquals("e", tree.search('e'));
 		assertEquals("f", tree.search('f'));
 
-//		tree.delete('a');
-//
-//		test = Utils.outputTree(tree);
-//		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
-//		assertEquals(correct, test);
+		tree.delete('a');
+
+		test = Utils.outputTree(tree);
+		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
+		assertEquals(correct, test);
 
 	}
 
