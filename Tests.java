@@ -69,11 +69,11 @@ public class Tests {
 		assertEquals("15", tree.search(15));
 		assertEquals("16", tree.search(16));
 
-//		tree.delete(2);
-//		test = Utils.outputTree(tree);
-//		Utils.printTree(tree);
-//		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
-//		assertEquals(test, correct);
+		tree.delete(2);
+		test = Utils.outputTree(tree);
+		Utils.printTree(tree);
+		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
+		assertEquals(test, correct);
 	}
 
 	@Test

@@ -351,11 +351,11 @@ public class BPlusTree<K extends Comparable<K>, T> {
 					IndexNode<K,T> parent = (IndexNode<K,T>)parentNode;
 					
 					if(s > 0 && parent.children.get(s-1) != null) {
-						splitKeyPos = handleIndexNodeUnderflow((IndexNode<K,T>)parent.children.get(s-1), 
-								index, parent);
+						splitKeyPos = handleIndexNodeUnderflow(
+								(IndexNode<K,T>)parent.children.get(s-1), index, parent);
 					} else {
-						splitKeyPos = handleIndexNodeUnderflow((IndexNode<K,T>)parent.children.get(s+1), 
-								index, parent);
+						splitKeyPos = handleIndexNodeUnderflow(
+								index, (IndexNode<K,T>)parent.children.get(s+1), parent);
 					}
 					// S has extra entries, set oldChildentry to null, return
 					if(splitKeyPos == -1) {
