@@ -23,6 +23,13 @@ public class Tests {
 		String correct = "@c/e/@%%[(a,a);(b,b);]#[(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
 
 		assertEquals(correct, test);
+		
+		assertEquals("a", tree.search('a'));
+		assertEquals("b", tree.search('b'));
+		assertEquals("c", tree.search('c'));
+		assertEquals("d", tree.search('d'));
+		assertEquals("e", tree.search('e'));
+		assertEquals("f", tree.search('f'));
 
 //		tree.delete('a');
 //
@@ -30,21 +37,6 @@ public class Tests {
 //		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
 //		assertEquals(correct, test);
 
-	}
-	
-	@Test
-	public void testSimpleHybrid3() {
-		Integer primeNumbers[] = new Integer[] { 2, 4, 5, 7, 8, 9, 10 };
-		String primeNumberStrings[] = new String[primeNumbers.length];
-		for (int i = 0; i < primeNumbers.length; i++) {
-			primeNumberStrings[i] = (primeNumbers[i]).toString();
-		}
-		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
-		Utils.bulkInsert(tree, primeNumbers, primeNumberStrings);
-
-		String test = Utils.outputTree(tree);
-		String correct = "@5/8/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);(10,10);]$%%";
-		assertEquals(correct, test);
 	}
 
 	// add some nodes, see if it comes out right, delete one, see if it's right
@@ -62,6 +54,20 @@ public class Tests {
 		String test = Utils.outputTree(tree);
 		String correct = "@10/@%%@5/8/@@12/14/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);]$[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
 		assertEquals(correct, test);
+		
+		assertEquals("2", tree.search(2));
+		assertEquals("4", tree.search(4));
+		assertEquals("5", tree.search(5));
+		assertEquals("7", tree.search(7));
+		assertEquals("8", tree.search(8));
+		assertEquals("9", tree.search(9));
+		assertEquals("10", tree.search(10));
+		assertEquals("11", tree.search(11));
+		assertEquals("12", tree.search(12));
+		assertEquals("13", tree.search(13));
+		assertEquals("14", tree.search(14));
+		assertEquals("15", tree.search(15));
+		assertEquals("16", tree.search(16));
 
 //		tree.delete(2);
 //		test = Utils.outputTree(tree);
@@ -70,6 +76,37 @@ public class Tests {
 //		assertEquals(test, correct);
 	}
 
+	@Test
+	public void testSearchSimpleHybrid3() {
+		Integer primeNumbers[] = new Integer[] { 2, 4, 5, 7, 8, 9, 10 };
+		String primeNumberStrings[] = new String[primeNumbers.length];
+		for (int i = 0; i < primeNumbers.length; i++) {
+			primeNumberStrings[i] = (primeNumbers[i]).toString();
+		}
+		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
+		Utils.bulkInsert(tree, primeNumbers, primeNumberStrings);
+
+		String test = Utils.outputTree(tree);
+		String correct = "@5/8/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);(10,10);]$%%";
+		assertEquals(correct, test);
+		
+		assertEquals("2", tree.search(2));
+		assertEquals("4", tree.search(4));
+		assertEquals("5", tree.search(5));
+		assertEquals("7", tree.search(7));
+		assertEquals("8", tree.search(8));
+		assertEquals("9", tree.search(9));
+		assertEquals("10", tree.search(10));
+		assertEquals(null, tree.search(1));
+		assertEquals(null, tree.search(99));
+		assertEquals(null, tree.search(null));
+		
+		BPlusTree<Integer, String> emptyTree = new BPlusTree<Integer, String>();
+		assertEquals(null, emptyTree.search(2));
+		assertEquals(null, emptyTree.search(72));
+		assertEquals(null, emptyTree.search(null));
+	}
+	
 //	@Test
 	public void testBookExampleShort() {
 		Integer exampleNumbers[] = new Integer[] { 2, 3, 13, 14, 17, 19, 24, 27,
