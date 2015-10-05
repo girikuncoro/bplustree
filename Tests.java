@@ -77,7 +77,7 @@ public class Tests {
 	}
 
 	@Test
-	public void testSearchSimpleHybrid3() {
+	public void testSimpleHybrid3() {
 		Integer primeNumbers[] = new Integer[] { 2, 4, 5, 7, 8, 9, 10 };
 		String primeNumberStrings[] = new String[primeNumbers.length];
 		for (int i = 0; i < primeNumbers.length; i++) {
@@ -100,7 +100,10 @@ public class Tests {
 		assertEquals(null, tree.search(1));
 		assertEquals(null, tree.search(99));
 		assertEquals(null, tree.search(null));
-		
+	}
+	
+	@Test
+	public void testSearchEmptyTree() {
 		BPlusTree<Integer, String> emptyTree = new BPlusTree<Integer, String>();
 		assertEquals(null, emptyTree.search(2));
 		assertEquals(null, emptyTree.search(72));
