@@ -31,11 +31,11 @@ public class Tests {
 		assertEquals("e", tree.search('e'));
 		assertEquals("f", tree.search('f'));
 
-//		tree.delete('a');
-//
-//		test = Utils.outputTree(tree);
-//		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
-//		assertEquals(correct, test);
+		tree.delete('a');
+
+		test = Utils.outputTree(tree);
+		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
+		assertEquals(correct, test);
 
 	}
 
@@ -69,15 +69,15 @@ public class Tests {
 		assertEquals("15", tree.search(15));
 		assertEquals("16", tree.search(16));
 
-//		tree.delete(2);
-//		test = Utils.outputTree(tree);
-//		Utils.printTree(tree);
-//		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
-//		assertEquals(test, correct);
+		tree.delete(2);
+		test = Utils.outputTree(tree);
+		Utils.printTree(tree);
+		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
+		assertEquals(test, correct);
 	}
 
 	@Test
-	public void testSearchSimpleHybrid3() {
+	public void testSimpleHybrid3() {
 		Integer primeNumbers[] = new Integer[] { 2, 4, 5, 7, 8, 9, 10 };
 		String primeNumberStrings[] = new String[primeNumbers.length];
 		for (int i = 0; i < primeNumbers.length; i++) {
@@ -100,14 +100,17 @@ public class Tests {
 		assertEquals(null, tree.search(1));
 		assertEquals(null, tree.search(99));
 		assertEquals(null, tree.search(null));
-		
+	}
+	
+	@Test
+	public void testSearchEmptyTree() {
 		BPlusTree<Integer, String> emptyTree = new BPlusTree<Integer, String>();
 		assertEquals(null, emptyTree.search(2));
 		assertEquals(null, emptyTree.search(72));
 		assertEquals(null, emptyTree.search(null));
 	}
 	
-//	@Test
+	@Test
 	public void testBookExampleShort() {
 		Integer exampleNumbers[] = new Integer[] { 2, 3, 13, 14, 17, 19, 24, 27,
 				30, 33, 34, 38, 5, 7, 16, 20, 22, 29 };
@@ -130,7 +133,7 @@ public class Tests {
 	}
 
 	// testing proper leaf node merging behaviour
-//	@Test
+	@Test
 	public void testDeleteLeafNodeRedistribute() {
 		Integer testNumbers[] = new Integer[] { 2, 4, 7, 8, 5, 6, 3 };
 		String testNumberStrings[] = new String[testNumbers.length];
@@ -151,7 +154,7 @@ public class Tests {
 	}
 
 	// Testing appropriate depth and node invariants on a big tree
-//	@Test
+	@Test
 	public void testLargeTree() {
 		BPlusTree<Integer, Integer> tree = new BPlusTree<Integer, Integer>();
 		ArrayList<Integer> numbers = new ArrayList<Integer>(100000);
