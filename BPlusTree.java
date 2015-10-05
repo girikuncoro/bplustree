@@ -251,6 +251,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		}
 
 		LeafNode<K,T> leaf = (LeafNode<K,T>)treeSearch(root, key);
+		// Some processes
 		return;
 	}
 	
@@ -260,8 +261,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			// Choose subtree, find i such that Ki <= entry's key value < K(i+1)
 			IndexNode<K,T> index = (IndexNode<K,T>)node;
 			int i = 0;
+			K entryKey = entry.getKey();
 			while(i < index.keys.size()) {
-				if(entry.getKey().compareTo(index.keys.get(i)) < 0) {
+				if(entryKey.compareTo(index.keys.get(i)) < 0) {
 					break;
 				}
 				i++;
@@ -276,8 +278,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			// Discarded child node case
 			else {
 				int j = 0;
+				K oldKey = oldChildEntry.getKey();
 				while(j < index.keys.size()) {
-					if(entry.getKey().compareTo(index.keys.get(j)) >= 0) {
+					if(oldKey.compareTo(index.keys.get(j)) >= 0) {
 						break;
 					}
 					j++;
@@ -292,8 +295,39 @@ public class BPlusTree<K extends Comparable<K>, T> {
 					return null; 
 				}
 				else {
-					// Redistribution etc
+					// Get sibling S using parent pointer
+					int s = 0;
+					K firstKey = index.keys.get(0);
+					while(s < parentNode.keys.size()) {
+						if(firstKey.compareTo(parentNode.keys.get(s)) < 0) {
+							break;
+						}
+						s++;
+					}
+					
+					// Handle index underflow
 				}
+			}
+		}
+		// The node is a leaf node
+		else {
+			LeafNode<K,T> leaf = (LeafNode<K,T>)node;
+			// Look for value to delete
+			for(int i=0; i<leaf.keys.size(); i++) {
+				if(leaf.keys.get(i) == entry.getKey()) {
+					leaf.keys.remove(i);
+					leaf.values.remove(i);
+					break;
+				}
+			}
+			
+			// Usual case: no underflow
+			if(!leaf.isUnderflowed()) {
+				return null;
+			}
+			// Once in a while, the leaf becomes underflow
+			else {
+				// Handle leaf underflow
 			}
 		}
 		return null;
@@ -313,8 +347,58 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 */
 	public int handleLeafNodeUnderflow(LeafNode<K,T> left, LeafNode<K,T> right,
 			IndexNode<K,T> parent) {
-		return -1;
-
+		// Find entry in parent for node on right
+		int i = 0;
+		K rKey = right.keys.get(0);
+		while(i < parent.keys.size()) {
+			if(rKey.compareTo(parent.keys.get(i)) < 0) {
+				break;
+			}
+			i++;
+		}	
+		// Redistribute evenly between right and left nodes
+		// If S has extra entries
+		if(left.keys.size() + right.keys.size() > 2*D) {
+			// Left node has more entries
+			if(left.keys.size() > right.keys.size()) {
+				while(left.keys.size() > D) {
+					right.keys.add(0, left.keys.get(left.keys.size()-1));
+					right.values.add(0, left.values.get(left.keys.size()-1));
+					left.keys.remove(left.keys.size()-1);
+					left.values.remove(left.values.size()-1);
+				}
+			}
+			// Right node has more entries
+			else {
+				while(left.keys.size() < D) {
+					left.keys.add(right.keys.get(0));
+					left.values.add(right.values.get(0));
+					right.keys.remove(0);
+					right.values.remove(0);
+				}
+			}
+			// Replace key value in parent entry by low-key in right node
+			parent.keys.set(i-1, right.keys.get(0));
+			
+			return -1;
+		}
+		// Merge leaf and S
+		else {
+			// Move all entries from right to left node
+			while(right.keys.size() > 0) {
+				left.keys.add(right.keys.get(0));
+				left.values.add(right.values.get(0));
+				right.keys.remove(0);
+				right.values.remove(0);
+			}
+			// Adjust sibling pointers
+			if(right.nextLeaf != null) {
+				right.nextLeaf.previousLeaf = left;
+			}
+			left.nextLeaf = right.nextLeaf;
+			
+			return i-1;
+		}
 	}
 
 	/**
