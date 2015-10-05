@@ -24,40 +24,40 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		if(key == null || root == null) {
 			return null;
 		}
-
-		return treeSearch(root, key);
+		// Look for leaf node that key is pointing to
+		LeafNode<K,T> leaf = (LeafNode<K,T>)treeSearch(root, key);
+					
+		// Look for value in the leaf
+		for(int i=0; i<leaf.keys.size(); i++) {
+			if(key.compareTo(leaf.keys.get(i)) == 0) {
+				return leaf.values.get(i);
+			}
+		}
+					
+		return null;
 	}
 	
-	private T treeSearch(Node<K,T> node, K key) {
+	private Node<K,T> treeSearch(Node<K,T> node, K key) {
 		if(node.isLeafNode) {
-			// Look for leaf node that key is pointing to
-			LeafNode<K,T> leaf = (LeafNode<K,T>)node;
-			
-			// Look for value in the leaf
-			for(int i=0; i<leaf.keys.size(); i++) {
-				if(key.compareTo(leaf.keys.get(i)) == 0) {
-					return leaf.values.get(i);
-				}
-			}
-			
-			return null;
+			return node;
 		} 
 		// The node is index node
 		else {
 			IndexNode<K,T> index = (IndexNode<K,T>)node;
+			
 			// K < K1, return treeSearch(P0, K)
-			if(key.compareTo(node.keys.get(0)) < 0) {
+			if(key.compareTo(index.keys.get(0)) < 0) {
 				return treeSearch((Node<K,T>)index.children.get(0), key);
 			}
 			// K >= Km, return treeSearch(Pm, K), m = #entries
-			else if(key.compareTo(node.keys.get(node.keys.size()-1)) >= 0) {
+			else if(key.compareTo(index.keys.get(node.keys.size()-1)) >= 0) {
 				return treeSearch((Node<K,T>)index.children.get(index.children.size()-1), key);
 			}
 			// Find i such that Ki <= K < K(i+1), return treeSearch(Pi,K)
 			else {
 				// Linear searching
 				for(int i=0; i<index.keys.size()-1; i++) {
-					if(key.compareTo(node.keys.get(i)) >= 0 && key.compareTo(node.keys.get(i+1)) < 0) {
+					if(key.compareTo(index.keys.get(i)) >= 0 && key.compareTo(index.keys.get(i+1)) < 0) {
 						return treeSearch((Node<K,T>)index.children.get(i+1), key);
 					}
 				}
@@ -87,25 +87,28 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		if(newChildEntry == null) {
 			return;
 		} else {
-			IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), root, newChildEntry.getValue());
+			IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), root, 
+					newChildEntry.getValue());
 			root = newRoot;
 			return;
 		}
 	}
 	
-	private Entry<K, Node<K,T>> getChildEntry(Node<K,T> node, Entry<K, Node<K,T>> entry, Entry<K, Node<K,T>> newChildEntry) {
+	private Entry<K, Node<K,T>> getChildEntry(Node<K,T> node, Entry<K, Node<K,T>> entry, 
+			Entry<K, Node<K,T>> newChildEntry) {
 		if(!node.isLeafNode) {
 			// Choose subtree, find i such that Ki <= entry's key value < J(i+1)
 			IndexNode<K,T> index = (IndexNode<K,T>) node;
 			int i = 0;
-			while(i < node.keys.size()) {
-				if(entry.getKey().compareTo(node.keys.get(i)) < 0) {
+			while(i < index.keys.size()) {
+				if(entry.getKey().compareTo(index.keys.get(i)) < 0) {
 					break;
 				}
 				i++;
 			}
 			// Recursively, insert entry
 			newChildEntry = getChildEntry((Node<K,T>) index.children.get(i), entry, newChildEntry);
+			
 			// Usual case, didn't split child
 			if(newChildEntry == null) {
 				return null;
@@ -114,7 +117,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			else {
 				int j = 0;
 				while (j < index.keys.size()) {
-					if(newChildEntry.getKey().compareTo(node.keys.get(j)) < 0) {
+					if(newChildEntry.getKey().compareTo(index.keys.get(j)) < 0) {
 						break;
 					}
 					j++;
@@ -128,10 +131,12 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				} 
 				else{
 					newChildEntry = splitIndexNode(index);
+					
 					// Root was just split
 					if(index == root) {
 						// Create new node and make tree's root-node pointer point to newRoot
-						IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), root, newChildEntry.getValue());
+						IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), root, 
+								newChildEntry.getValue());
 						root = newRoot;
 						return null;
 					}
@@ -154,7 +159,8 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			else {
 				newChildEntry = splitLeafNode(leaf);
 				if(leaf == root) {
-					IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), leaf, newChildEntry.getValue());
+					IndexNode<K,T> newRoot = new IndexNode<K,T>(newChildEntry.getKey(), leaf, 
+							newChildEntry.getValue());
 					root = newRoot;
 					return null;
 				}
@@ -240,7 +246,57 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @param key
 	 */
 	public void delete(K key) {
+		if(key == null || root == null) {
+			return;
+		}
 
+		LeafNode<K,T> leaf = (LeafNode<K,T>)treeSearch(root, key);
+		return;
+	}
+	
+	private Entry<K, Node<K,T>> deleteChildEntry(Node<K,T> parentNode, Node<K,T> node, 
+			Entry<K, Node<K,T>> entry, Entry<K, Node<K,T>> oldChildEntry) {
+		if(!node.isLeafNode) {
+			// Choose subtree, find i such that Ki <= entry's key value < K(i+1)
+			IndexNode<K,T> index = (IndexNode<K,T>)node;
+			int i = 0;
+			while(i < index.keys.size()) {
+				if(entry.getKey().compareTo(index.keys.get(i)) < 0) {
+					break;
+				}
+				i++;
+			}
+			// Recursive delete
+			oldChildEntry = deleteChildEntry(node, index.children.get(i), entry, oldChildEntry);
+			
+			// Usual case: child not deleted
+			if(oldChildEntry == null) {
+				return null;
+			}
+			// Discarded child node case
+			else {
+				int j = 0;
+				while(j < index.keys.size()) {
+					if(entry.getKey().compareTo(index.keys.get(j)) >= 0) {
+						break;
+					}
+					j++;
+				}
+				// Remove oldChildEntry from node
+				index.keys.remove(j);
+				index.children.remove(j+1);
+				
+				// Check for underflow
+				if(!index.isUnderflowed()) {
+					// Node has entries to spare, delete doesn't go further
+					return null; 
+				}
+				else {
+					// Redistribution etc
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
