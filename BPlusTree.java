@@ -99,10 +99,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			IndexNode<K,T> index = (IndexNode<K,T>) node;
 			int i = 0;
 			while(i < node.keys.size()) {
-				if(entry.getKey().compareTo(node.keys.get(i)) < 0) {
-					break;
+				if(entry.getKey().compareTo(node.keys.get(i)) >= 0) {
+					i++;
 				}
-				i++;
 			}
 			// Recursively, insert entry
 			newChildEntry = getChildEntry((Node<K,T>) index.children.get(i), entry, newChildEntry);
@@ -114,10 +113,9 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			else {
 				int j = 0;
 				while (j < index.keys.size()) {
-					if(newChildEntry.getKey().compareTo(node.keys.get(j)) < 0) {
-						break;
+					if(newChildEntry.getKey().compareTo(node.keys.get(j)) >= 0) {
+						j++;
 					}
-					j++;
 				}
 				
 				index.insertSorted(newChildEntry, j);
