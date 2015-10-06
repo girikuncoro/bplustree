@@ -24,14 +24,12 @@ public class Tests {
 
 		assertEquals(correct, test);
 		
-		assertEquals("a", tree.search('a'));
-		assertEquals("b", tree.search('b'));
-		assertEquals("c", tree.search('c'));
-		assertEquals("d", tree.search('d'));
-		assertEquals("e", tree.search('e'));
-		assertEquals("f", tree.search('f'));
+		for(int i=0; i<alphabet.length; i++) {
+			assertEquals(""+alphabet[i], tree.search(alphabet[i]));
+		}
 
 		tree.delete('a');
+		assertEquals(null, tree.search('a'));
 
 		test = Utils.outputTree(tree);
 		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
@@ -55,21 +53,13 @@ public class Tests {
 		String correct = "@10/@%%@5/8/@@12/14/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);]$[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
 		assertEquals(correct, test);
 		
-		assertEquals("2", tree.search(2));
-		assertEquals("4", tree.search(4));
-		assertEquals("5", tree.search(5));
-		assertEquals("7", tree.search(7));
-		assertEquals("8", tree.search(8));
-		assertEquals("9", tree.search(9));
-		assertEquals("10", tree.search(10));
-		assertEquals("11", tree.search(11));
-		assertEquals("12", tree.search(12));
-		assertEquals("13", tree.search(13));
-		assertEquals("14", tree.search(14));
-		assertEquals("15", tree.search(15));
-		assertEquals("16", tree.search(16));
+		for(int i=0; i<primeNumbers.length; i++) {
+			assertEquals(""+primeNumbers[i], tree.search(primeNumbers[i]));
+		}
 
 		tree.delete(2);
+		assertEquals(null, tree.search(2));
+		
 		test = Utils.outputTree(tree);
 		Utils.printTree(tree);
 		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
@@ -90,13 +80,10 @@ public class Tests {
 		String correct = "@5/8/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);(10,10);]$%%";
 		assertEquals(correct, test);
 		
-		assertEquals("2", tree.search(2));
-		assertEquals("4", tree.search(4));
-		assertEquals("5", tree.search(5));
-		assertEquals("7", tree.search(7));
-		assertEquals("8", tree.search(8));
-		assertEquals("9", tree.search(9));
-		assertEquals("10", tree.search(10));
+		for(int i=0; i<primeNumbers.length; i++) {
+			assertEquals(""+primeNumbers[i], tree.search(primeNumbers[i]));
+		}
+
 		assertEquals(null, tree.search(1));
 		assertEquals(null, tree.search(99));
 		assertEquals(null, tree.search(null));
@@ -108,6 +95,37 @@ public class Tests {
 		assertEquals(null, emptyTree.search(2));
 		assertEquals(null, emptyTree.search(72));
 		assertEquals(null, emptyTree.search(null));
+	}
+	
+	@Test
+	public void testWithoutIndexNode() {
+		Character alphabet[] = new Character[] { 'c', 'a'};
+		String alphabetStrings[] = new String[alphabet.length];
+		for (int i = 0; i < alphabet.length; i++) {
+			alphabetStrings[i] = (alphabet[i]).toString();
+		}
+		BPlusTree<Character, String> tree = new BPlusTree<Character, String>();
+		Utils.bulkInsert(tree, alphabet, alphabetStrings);
+
+		String test = Utils.outputTree(tree);
+		String correct = "[(a,a);(c,c);]$%%";
+		assertEquals(correct, test);
+		
+		tree.delete('a');
+		tree.delete('b');
+		tree.delete('c');
+		tree.delete('d');
+		test = Utils.outputTree(tree);
+		correct = "[]$%%";
+		assertEquals(correct, test);
+		
+		tree.insert(new Character('e'), "e");
+		tree.insert(new Character('f'), "f");
+		tree.insert(new Character('g'), "g");
+		tree.insert(new Character('h'), "h");
+		test = Utils.outputTree(tree);
+		correct = "[(e,e);(f,f);(g,g);(h,h);]$%%";
+		assertEquals(correct, test);
 	}
 	
 	@Test
