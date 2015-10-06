@@ -140,16 +140,37 @@ public class Tests {
 		Utils.bulkInsert(tree, exampleNumbers, primeNumberStrings);
 		Utils.printTree(tree);
 		
+		String test = Utils.outputTree(tree);
+		String correct = "@13/17/24/30/@%%[(2,2);(3,3);(5,5);(7,7);]#[(13,13);(14,14);(16,16);]#[(17,17);(19,19);(20,20);(22,22);]#[(24,24);(27,27);(29,29);]#[(30,30);(33,33);(34,34);(38,38);]$%%";
+		
 		tree.delete(13);
 		tree.delete(17);
 		tree.delete(30);
 		tree.insert(39, "39");
 		Utils.printTree(tree);
 		// Initial tree
-		String test = Utils.outputTree(tree);
-		String correct = "@13/17/24/30/@%%[(2,2);(3,3);(5,5);(7,7);]#[(14,14);(16,16);]#[(19,19);(20,20);(22,22);]#[(24,24);(27,27);(29,29);]#[(33,33);(34,34);(38,38);(39,39);]$%%";
+		test = Utils.outputTree(tree);
+		correct = "@13/17/24/30/@%%[(2,2);(3,3);(5,5);(7,7);]#[(14,14);(16,16);]#[(19,19);(20,20);(22,22);]#[(24,24);(27,27);(29,29);]#[(33,33);(34,34);(38,38);(39,39);]$%%";
+		assertEquals(test, correct);
+		
+		// Delete most left node
+		tree.delete(2);
+		tree.delete(3);
+		tree.delete(5);
+		test = Utils.outputTree(tree);
+		correct = "@17/24/30/@%%[(7,7);(14,14);(16,16);]#[(19,19);(20,20);(22,22);]#[(24,24);(27,27);(29,29);]#[(33,33);(34,34);(38,38);(39,39);]$%%";
+		assertEquals(test, correct);
+		
+		// Delete most right node
+		tree.delete(39);
+		tree.delete(38);
+		tree.delete(34);
+		test = Utils.outputTree(tree);
+		correct = "@17/24/29/@%%[(7,7);(14,14);(16,16);]#[(19,19);(20,20);(22,22);]#[(24,24);(27,27);]#[(29,29);(33,33);]$%%";
 		assertEquals(test, correct);
 	}
+	
+	
 
 	// testing proper leaf node merging behaviour
 	@Test
@@ -161,8 +182,6 @@ public class Tests {
 		}
 		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
 		Utils.bulkInsert(tree, testNumbers, testNumberStrings);
-		System.out.println("Bug: ");
-		System.out.println(Utils.outputTree(tree));
 
 		tree.delete(6);
 		tree.delete(7);
