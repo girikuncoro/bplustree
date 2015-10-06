@@ -2,13 +2,13 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TestsThreeD {
+public class TestsOneD {
 
-	// Change D = 3 on BPlusTree.java before running this test case
+	// Change D = 1 on BPlusTree.java before running this test case
 	@Test
 	public void testSimpleHybrid() {
 		System.out.println("\n testSimpleHybrid");
-		Character alphabet[] = new Character[] { 'a', 'b', 'c', 'd', 'e', 'f'};
+		Character alphabet[] = new Character[] { 'a', 'b'};
 		String alphabetStrings[] = new String[alphabet.length];
 		for (int i = 0; i < alphabet.length; i++) {
 			alphabetStrings[i] = (alphabet[i]).toString();
@@ -17,30 +17,34 @@ public class TestsThreeD {
 		Utils.bulkInsert(tree, alphabet, alphabetStrings);
 
 		String test = Utils.outputTree(tree);
-		String correct = "[(a,a);(b,b);(c,c);(d,d);(e,e);(f,f);]$%%";
-
+		String correct = "[(a,a);(b,b);]$%%";
 		assertEquals(correct, test);
 		
 		for(int i=0; i<alphabet.length; i++) {
 			assertEquals(""+alphabet[i], tree.search(alphabet[i]));
 		}
 		
-		tree.insert(new Character('g'), "g");
+		tree.insert(new Character('c'),"c");
 		test = Utils.outputTree(tree);
-		correct = "@d/@%%[(a,a);(b,b);(c,c);]#[(d,d);(e,e);(f,f);(g,g);]$%%"; 
-
+		correct = "@b/@%%[(a,a);]#[(b,b);(c,c);]$%%";
+		
 		// Delete from left
 		tree.delete('a');
 		assertEquals(null, tree.search('a'));
-
 		test = Utils.outputTree(tree);
-		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
-		assertEquals(correct, test);
+		correct = "@c/@%%[(b,b);]#[(c,c);]$%%";
+
+		tree.delete('c');
+		test = Utils.outputTree(tree);
+		correct = "[(b,b);]$%%";
 		
 		tree.delete('b');
 		test = Utils.outputTree(tree);
-		correct = "[(c,c);(d,d);(e,e);(f,f);(g,g);]$%%";
-		assertEquals(correct, test);
+		correct = "[]$%%";
+		
+		tree.insert(new Character('c'),"c");
+		test = Utils.outputTree(tree);
+		correct = "[(c,c);]$%%";
 	}
 
 	public <K extends Comparable<K>, T> void testTreeInvariants(

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class BPlusTree<K extends Comparable<K>, T> {
 
 	public Node<K,T> root;
-	public static final int D = 3;
+	public static final int D = 2;
 
 	/**
 	 * TODO Search the value for a specific key
@@ -388,7 +388,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			// Once in a while, the leaf becomes underflow
 			else {
 				// Return if root
-				if(leaf == root) {
+				if(leaf == root || leaf.keys.size() == 0) {
 					return oldChildEntry;
 				}
 				// Handle leaf underflow
