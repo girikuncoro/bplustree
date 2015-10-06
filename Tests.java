@@ -64,6 +64,12 @@ public class Tests {
 		Utils.printTree(tree);
 		correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
 		assertEquals(test, correct);
+		
+		tree.insert(2, "2");
+		tree.insert(3, "3");
+		test = Utils.outputTree(tree);
+		correct = "@10/@%%@4/8/@@12/14/@%%[(2,2);(3,3);]#[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]$[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
+		assertEquals(correct, test);
 	}
 
 	@Test
@@ -169,8 +175,6 @@ public class Tests {
 		correct = "@17/24/29/@%%[(7,7);(14,14);(16,16);]#[(19,19);(20,20);(22,22);]#[(24,24);(27,27);]#[(29,29);(33,33);]$%%";
 		assertEquals(test, correct);
 	}
-	
-	
 
 	// testing proper leaf node merging behaviour
 	@Test
