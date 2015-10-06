@@ -77,7 +77,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(key, newLeaf);
 		
 		// Insert entry into subtree with root node pointer
-		if(root == null) {
+		if(root == null || root.keys.size() == 0) {
 			root = entry.getValue();
 		}
 		
@@ -388,7 +388,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			// Once in a while, the leaf becomes underflow
 			else {
 				// Return if root
-				if(leaf == root) {
+				if(leaf == root || leaf.keys.size() == 0) {
 					return oldChildEntry;
 				}
 				// Handle leaf underflow
